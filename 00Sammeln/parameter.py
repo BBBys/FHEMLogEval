@@ -1,0 +1,1 @@
+MNTPUNKT="logs.tmp"
