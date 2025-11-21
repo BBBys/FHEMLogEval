@@ -11,6 +11,11 @@ DBTCREATEBB = """ CREATE TABLE `blackboard` (
  `zeit` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'wann der Eintrag erzeugt wurde',
  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"""
+DBTCREATELOGFILES = """CREATE TABLE `logfiles` (
+ `name` tinytext NOT NULL,
+ `typ` tinytext DEFAULT NULL,
+ PRIMARY KEY (`name`(10))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='bekannte Logfiles und ihr Typ'"""
 
 DBTCREATEBILDER = """ CREATE TABLE `bilder` (
  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'simpler Zähler',
@@ -61,8 +66,8 @@ def dbcreate(db, errtext):
     logging.debug(f"dbcreate: {tabelle}")
     with db.cursor() as cursor:
         match tabelle:
-            case "bilder":
-                cursor.execute(DBTCREATEBILDER)
+            case "logfiles":
+                cursor.execute(DBTCREATELOGFILES)
             case "blackboard":
                 cursor.execute(DBTCREATEBB)
             case _:

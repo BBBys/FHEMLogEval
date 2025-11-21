@@ -1,19 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# FHEM Logs Evaluator  © 2025 by Dr. Burkhard Borys 
-# is licensed under CC BY-NC-ND 4.0. 
+# FHEM Logs Evaluator  © 2025 by Dr. Burkhard Borys
+# is licensed under CC BY-NC-ND 4.0.
 #
 #  LogsSammeln.py
 
 import mysql.connector
 import logging, argparse
-from erfassen import erfassen
 from dbroutinen import dbcreate
 from dbparam import *
-from datetime import date, datetime, timedelta
 from logseintragen import logsEintragen
-from mountlogs import mountLogs,unmountLogs
+from mountlogs import mountLogs, unmountLogs
 
 TITEL = "LogsSammeln"
 VERSION = "V0"
@@ -42,14 +40,11 @@ def EinträgeWiederherstellen(db):
     # endet hier
 
 
-def main(pfad):
-
-    logPath=mountLogs()
+def main(keep=False):
+    logPath = mountLogs()
     if logPath is None:
         logging.error("Logs konnten nicht eingebunden werden")
-    unmountLogs(logPath)
-
-    return
+        return "Fehler"
     try:
         mydb = mysql.connector.connect(
             host=DBHOST, db=DBNAME, user=DBUSER, port=DBPORT, password=DBPWD
@@ -59,38 +54,7 @@ def main(pfad):
         #    zurücksetzenBilder(TITEL, mydb)
         #    logging.info("...zurückgesetzt, Ende")
         #    return 0
-
-        if pfad != VERARBEITEN:
-            return logsEintragen(mydb, pfad)
-
-        with mydb.cursor() as mycursor:
-            SQL = "SELECT id,parameter FROM %s WHERE programm='%s';" % (
-                DBTBB,
-                TITEL,
-            )
-            mycursor.execute(SQL)
-            Aufträge = mycursor.fetchall()
-        logging.debug("%d Records" % len(Aufträge))
-
-        if len(Aufträge) < 1:
-            return "kein Auftrag vorhanden"
-        # es gibt indestens 1 Aufträge
-
-        Auftrag = Aufträge[0]  # nur den ersten
-        logging.debug(Auftrag)
-        id = Auftrag[0]
-        pfad = Auftrag[1]
-        logging.info(f"{TITEL}: Start Auftrag {pfad}")
-        ok = erfassen(pfad, mydb, TITEL)
-        if ok:
-            with mydb.cursor() as mycursor:
-                SQL = f"DELETE FROM {DBTBB} WHERE id={id};"
-                mycursor.execute(SQL)
-                mydb.commit()
-            logging.info(f"{TITEL}: Auftrag {Auftrag[0]} erfolgreich")
-        else:
-            logging.error(f"{TITEL}: Auftrag {Auftrag[0]} nicht erfolgreich")
-
+        logsEintragen(mydb, logPath)
     except mysql.connector.errors.ProgrammingError as e:
         logging.error(e)
         match e.errno:
@@ -104,6 +68,10 @@ def main(pfad):
         logging.exception(e)
     finally:
         mydb.close()
+
+    if not keep:
+        unmountLogs(logPath)
+
     return 0
 
 
@@ -113,15 +81,15 @@ if __name__ == "__main__":
     # LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(message)s"
     LOG_FORMAT = "%(levelname)s %(message)s"
     parser = argparse.ArgumentParser(prog=TITEL, description=DESCRIPTION)
-    parser.add_argument(
-        "pfad",
-        nargs="?",
-        default=VERARBEITEN,
-        help="optional: Pfad\n"
-        "- wenn angegeben: Pfad wird nach Logs durchsucht und Dateien "
-        "werden in Auftrags-DB geschrieben.\n"
-        "- wenn nicht angegeben: Aufträge werden ausgeführt.",
-    )
+    # parser.add_argument(
+    #    "pfad",
+    #    nargs="?",
+    #    default=VERARBEITEN,
+    #    help="optional: Pfad\n"
+    #    "- wenn angegeben: Pfad wird nach Logs durchsucht und Dateien "
+    #    "werden in Auftrags-DB geschrieben.\n"
+    #    "- wenn nicht angegeben: Aufträge werden ausgeführt.",
+    # )
 
     parser.add_argument(
         "-v",
@@ -129,6 +97,13 @@ if __name__ == "__main__":
         dest="pVerbose",
         action="store_true",
         help="Debug-Ausgabe",
+    )
+    parser.add_argument(
+        "-k",
+        "--keep",
+        dest="pKeep",
+        action="store_true",
+        help="Logfiles behalten (kein Un-Mount nach Verarbeitung)",
     )
     # parser.add_argument(
     #    "-z",
@@ -138,12 +113,13 @@ if __name__ == "__main__":
     #    help="alle Einträge der Bilder-Sammlung löschen",
     # )
     arguments = parser.parse_args()
-    pfad = arguments.pfad
+    # pfad = arguments.pfad
     # ZURÜCK = arguments.pZurck
+    keep = arguments.pKeep
     if arguments.pVerbose:
         LOG_LEVEL = logging.DEBUG
     else:
         LOG_LEVEL = logging.INFO
     logging.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
-    sys.exit(main(pfad))
+    sys.exit(main(keep))
