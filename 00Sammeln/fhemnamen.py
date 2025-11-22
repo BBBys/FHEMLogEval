@@ -2,11 +2,10 @@
 import logging
 import os
 
-# from string import isdigits
-
 
 def nameReduzieren(original0):
     gestripped = original0.strip().lower()
+    nurName = gestripped  # Hilfskonstruktion, falls weitere Abfragen versagen
     name1, ext1 = os.path.splitext(gestripped)
     logging.debug(f"nameReduzieren: {gestripped} > {name1} {ext1}")
     if ext1[1:].isdecimal():

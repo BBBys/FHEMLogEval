@@ -40,7 +40,7 @@ def EinträgeWiederherstellen(db):
     # endet hier
 
 
-def main(keep=False):
+def main(keep=False, Dbg=False):
     logPath = mountLogs()
     if logPath is None:
         logging.error("Logs konnten nicht eingebunden werden")
@@ -54,7 +54,7 @@ def main(keep=False):
         #    zurücksetzenBilder(TITEL, mydb)
         #    logging.info("...zurückgesetzt, Ende")
         #    return 0
-        logsEintragen(mydb, logPath)
+        logsEintragen(mydb, logPath, Dbg)
     except mysql.connector.errors.ProgrammingError as e:
         logging.error(e)
         match e.errno:
@@ -116,10 +116,11 @@ if __name__ == "__main__":
     # pfad = arguments.pfad
     # ZURÜCK = arguments.pZurck
     keep = arguments.pKeep
-    if arguments.pVerbose:
+    Dbg = arguments.pVerbose
+    if Dbg:
         LOG_LEVEL = logging.DEBUG
     else:
         LOG_LEVEL = logging.INFO
     logging.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
-    sys.exit(main(keep))
+    sys.exit(main(keep, Dbg))

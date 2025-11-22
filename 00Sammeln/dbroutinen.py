@@ -12,10 +12,13 @@ DBTCREATEBB = """ CREATE TABLE `blackboard` (
  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"""
 DBTCREATELOGFILES = """CREATE TABLE `logfiles` (
- `name` tinytext NOT NULL,
- `typ` tinytext DEFAULT NULL,
- PRIMARY KEY (`name`(10))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='bekannte Logfiles und ihr Typ'"""
+ `basisname` tinytext DEFAULT NULL COMMENT 'reduzierter Dateiname',
+ `dateiname` tinytext NOT NULL COMMENT 'Dateiname, ohne Pfad, ist Zugriffskriterium',
+ `pfad` tinytext DEFAULT NULL COMMENT 'vollständiger Pfad und Name',
+ `typ` tinyint(3) unsigned DEFAULT NULL COMMENT 'aus Inhalt ermittelter Typ',
+ PRIMARY KEY (`dateiname`(10))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='bekannte Logfiles und ihr Typ'
+"""
 
 DBTCREATEBILDER = """ CREATE TABLE `bilder` (
  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'simpler Zähler',
