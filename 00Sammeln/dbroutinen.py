@@ -16,7 +16,7 @@ DBTCREATELOGFILES = """CREATE TABLE `logfiles` (
  `dateiname` tinytext NOT NULL COMMENT 'Dateiname, ohne Pfad, ist Zugriffskriterium',
  `pfad` tinytext DEFAULT NULL COMMENT 'vollständiger Pfad und Name',
  `typ` tinyint(3) unsigned DEFAULT NULL COMMENT 'aus Inhalt ermittelter Typ',
- PRIMARY KEY (`dateiname`(10))
+ PRIMARY KEY (`dateiname`(40))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='bekannte Logfiles und ihr Typ'
 """
 
@@ -65,7 +65,7 @@ def dbcreate(db, errtext):
     Returns:
         -: 0
     """
-    tabelle = errtext.split("cv.")[1].split("'")[0]
+    tabelle = errtext.split("fhemlogs.")[1].split("'")[0]
     logging.debug(f"dbcreate: {tabelle}")
     with db.cursor() as cursor:
         match tabelle:

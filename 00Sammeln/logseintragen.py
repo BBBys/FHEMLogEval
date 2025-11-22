@@ -34,17 +34,13 @@ def logsEintragen(db, pfad, Dbg=False):
                 result = cursor.fetchone()
                 if result is None:
                     # Datei noch U. N. B. Kant
-                    logging.debug(
-                        f"logsEintragen: Datei {file} unbekannt, Eintrag erstellen"
-                    )
                     typ = logAnalyse(fileMitPfad)
                     assert typ is not None
                     if typ == 99:
                         logging.debug(f"{file} übersprungen")
                         continue
                     if typ < 1:
-                        logging.warning(f"logsEintragen: Typ {file} unbekannt")
-                        raise Exception("Abbruch")
+                        raise Exception(f"logsEintragen: Typ {typ} von {file} unbekannt")
                     sql = f"INSERT INTO {DBTLOGS} (basisname,dateiname,pfad,typ) VALUES ('{basisName}','{file}','{fileMitPfad}',{typ})"
                     logging.debug(sql)
                     cursor.execute(sql)
