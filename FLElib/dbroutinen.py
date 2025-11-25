@@ -16,6 +16,9 @@ DBTCREATELOGFILES = """CREATE TABLE `logfiles` (
  `dateiname` tinytext NOT NULL COMMENT 'Dateiname, ohne Pfad, ist Zugriffskriterium',
  `pfad` tinytext DEFAULT NULL COMMENT 'vollständiger Pfad und Name',
  `typ` tinyint(3) unsigned DEFAULT NULL COMMENT 'aus Inhalt ermittelter Typ',
+ `zeilen` mediumint(8) unsigned DEFAULT NULL COMMENT 'Anzahl ZEILEN',
+ `erste` datetime DEFAULT NULL COMMENT 'ältester Eintrag',
+ `letzte` datetime DEFAULT NULL COMMENT 'jüngster Eintrag',
  PRIMARY KEY (`dateiname`(40))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='bekannte Logfiles und ihr Typ'
 """

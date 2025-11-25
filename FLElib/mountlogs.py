@@ -1,4 +1,4 @@
-import logging
+import sys, logging
 import subprocess, os
 from parameter import MNTPUNKT, TESTFILE
 from time import sleep
@@ -6,10 +6,7 @@ from time import sleep
 
 def mountLogs():
     logging.debug("einhängen")
-    # wo sind wir?
-    cwd = os.getcwd()
-    # so soll es heißen, notfalls machen
-    mntp = os.path.join(cwd, MNTPUNKT)
+    mntp = MNTPUNKT
     if not os.path.exists(mntp):
         logging.warning(f"Mounpoint {mntp} fehlt - wird erzeugt")
         os.mkdir(mntp)
