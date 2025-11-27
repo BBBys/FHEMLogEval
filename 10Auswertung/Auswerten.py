@@ -14,7 +14,7 @@
 import mysql.connector
 import logging, argparse
 from dbroutinen import dbcreate
-from  dbparam import *
+from dbparam import *
 from logsabrufen import logsAbrufen
 from mountlogs import mountLogs, unmountLogs
 
@@ -25,6 +25,7 @@ DESCRIPTION = """Log-Files, die in der Datenbank stehen, \n
 grob auswerten und die wichtigsten Eigenschaften abspeichern
 """
 
+
 def main(keep=False, Dbg=False):
     logPath = mountLogs()
     if logPath is None:
@@ -32,8 +33,7 @@ def main(keep=False, Dbg=False):
         return "Fehler"
     try:
         mydb = mysql.connector.connect(
-            host=DBHOST, db=DBNAME, user=DBUSER, port=DBPORT, 
-            password=DBPWD
+            host=DBHOST, db=DBNAME, user=DBUSER, port=DBPORT, password=DBPWD
         )  # + ";ConvertZeroDateTime=True;",
         logsAbrufen(mydb, logPath, Dbg)
     except mysql.connector.errors.ProgrammingError as e:

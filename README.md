@@ -1,5 +1,24 @@
 # FHEMLogEval
- Evaluate Logs produced by FHEM Home Automation
+Evaluate Logs produced by FHEM Home Automation
+# Ablaufschritte 
+## erforderlich
+Samba-Freigabe der Logfiles auf dem Server
+## 00Sammeln
+- Logfile-Verzeichnis vom Server einhängen
+  - Mountpoint ist auf /tmp
+- für jedes Logfile einen Eintrag in die Datenbank machen
+  - Name
+  - Format der Einträge
+## 10Auswertung
+für jeden Eintrag in der Datenbank eine Übersicht erstellen
+- Zeitraum
+- Anzahl der Meldungen
+- fehlerhafte Meldungen
+## wiederholt verwendete Parameter
+* -k: eingehängtes Verzeichnis bleibt erhalten
+* -v: wie üblich: Debug-Ausgabe
+## FLElib
+... fasst zentrale Module zusammen
 # Lizenz
 FHEM Logs Evaluator  © 2025 by Dr. Burkhard Borys 
 is licensed under CC BY-NC-ND 4.0. 
