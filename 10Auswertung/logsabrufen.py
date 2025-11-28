@@ -4,8 +4,9 @@ import logging
 from logauswerten import logAuswerten
 from loganalyse import logAnalyse
 
-#Liste der Logfiles abrufen
-#jede einzelne auswerten
+
+# Liste der Logfiles abrufen
+# jede einzelne auswerten
 def logsAbrufen(db, pfad, Dbg=False):
     if not os.path.exists(pfad):
         logging.fatal(f"logsAbrufen: Pfad {pfad} existiert nicht.")
@@ -16,5 +17,6 @@ def logsAbrufen(db, pfad, Dbg=False):
         result = cursor.fetchall()
     for datei in result:
         OK = logAuswerten(db, datei, Dbg)
-        if not OK:            break
+        if not OK:
+            break
     return

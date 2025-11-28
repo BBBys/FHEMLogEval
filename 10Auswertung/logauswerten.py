@@ -6,14 +6,14 @@ from string import Template
 
 # Typ 2: abwechselnd
 # 0                   1       2             3    4 5
-# 2025-11-22_17:26:15 T_EG_Wz rel_humidity: 45   % 
+# 2025-11-22_17:26:15 T_EG_Wz rel_humidity: 45   %
 # 2025-11-22_17:26:15 T_EG_Wz temperature:  22.0 C (measured)
 
 aus = Template(
     """---------------------------------
-      Datei: $name
-      Meldungen: $nm mit $nf Fehlern
-      Durchschnittlich $pro Meldungen pro Stunde, $pro2 pro Minute
+      Datei $name
+      $nm Meldungen mit $nf Fehlern
+      Durchschnittlich $pro pro Stunde, $pro2 pro Minute
       über $dauer
       von $von bis $bis"""
 )
@@ -47,6 +47,36 @@ def ignorieren(zeile):
 
     return False
 
+def zeileAuswertbar(zeile, typ):
+    Fehler=False
+
+    teile = zeile.split()
+    datstr = teile[0]
+    lds = len(datstr)
+    if lds != 19:
+        # vielleicht gestörte Zeile bei Restart
+        if lds > 30:return Fehler
+        logging.warning(f"daten: Zeile {zeile} Datum unbrauchbar")
+        return Fehler
+    if typ == 1:
+        l = len(teile)
+        if l < 4 or l > 5:
+            # Sonderfall Wetterdaten:
+            # 2025-10-10_14:43:01 Wetterdaten Errors
+            if l == 3 and teile[1] == "Wetterdaten":return Fehler
+            logging.warning(f"daten: Zeile {zeile} unbrauchbar")
+            return Fehler
+    elif typ == 2:
+        l = len(teile)
+        if l < 5 or l > 6:
+            logging.warning(f"daten: Zeile {zeile} l={l} unbrauchbar")
+            return Fehler
+    else:
+        logging.error(f"daten: Unbekannter Log-Typ {typ} in Zeile {zeile}")
+        return Fehler
+
+    return True
+
 def datenAuswerten(pfad, typ):
     musterDatum = "%Y-%m-%d_%H:%M:%S"
     erste = datetime.strptime("2099-12-31_0:0:0", musterDatum)
@@ -60,36 +90,11 @@ def datenAuswerten(pfad, typ):
             if ignorieren(zeile):
                 continue
             nZeilen += 1
-            teile = zeile.split()
-            datstr = teile[0]
-            lds = len(datstr)
-            if lds != 19:
-                # vielleicht gestörte Zeile bei Restart
-                if lds > 30:
-                    continue
-                logging.warning(f"daten: Zeile {zeile} Datum unbrauchbar")
+            if not zeileAuswertbar(zeile, typ):
                 nFehler += 1
                 continue
-            if typ == 1:
-                l = len(teile)
-                if l < 4 or l > 5:
-                    # Sonderfall Wetterdaten:
-                    # 2025-10-10_14:43:01 Wetterdaten Errors
-                    if l == 3 and teile[1] == "Wetterdaten":
-                        continue
-                    logging.warning(f"daten: Zeile {zeile} unbrauchbar")
-                    nFehler += 1
-                    continue
-            elif typ == 2:
-                l = len(teile)
-                if l < 5 or l > 6:
-                    logging.warning(f"daten: Zeile {zeile} l={l} unbrauchbar")
-                    nFehler += 1
-                    continue
-            else:
-                logging.error(f"daten: Unbekannter Log-Typ {typ} in Zeile {zeile}")
-                return (0, 0, 0)
-
+            teile = zeile.split()
+            datstr = teile[0]
             zeit = datetime.strptime(datstr, musterDatum)
             if zeit < erste:
                 erste = zeit
@@ -98,18 +103,19 @@ def datenAuswerten(pfad, typ):
     # logging.debug(f"Zeit: {erste}...{letzte}")
     return (erste, letzte, nZeilen, nFehler)
 
-#eine einzelne Logfile auswerten,
-#Ergebnis anzeigen und in DB speichern
-#return False, wenn es nicht weitergehen kann
+
+# eine einzelne Logfile auswerten,
+# Ergebnis anzeigen und in DB speichern
+# return False, wenn es nicht weitergehen kann
 def logAuswerten(db, datei, Dbg=False):
     name = datei["dateiname"]
     typ = datei["typ"]
     pfad = datei["pfad"]
-    #logging.debug(f"logAuswerten: {name}")
+    # logging.debug(f"logAuswerten: {name}")
     if not path.exists(pfad):
         logging.warning(f"logAuswerten: Datei {name} existiert nicht mehr")
         return True
-    
+
     (von, bis, nZeilen, nFehler) = datenAuswerten(pfad, typ)
     with db.cursor(buffered=True) as cursor:
         sql = f"update {DBTLOGS} set erste='{von}', letzte='{bis}', zeilen='{nZeilen}' where dateiname='{name}'"
@@ -117,11 +123,20 @@ def logAuswerten(db, datei, Dbg=False):
         cursor.execute(sql)
     db.commit()
 
+    alterTage = (datetime.now() - bis).total_seconds() / 86400
     dauer = bis - von
-    alterTage=( datetime.now() - bis).total_seconds()/86400
-    dauerTage=dauer.total_seconds()/86400
+    dauerTage = dauer.total_seconds() / 86400
     proStunde = nZeilen / dauer.total_seconds() * 3600
     proMinute = nZeilen / dauer.total_seconds() * 60
+
+    if nZeilen <3:
+        print("---------------------------------")
+        print(f"      {name}\n***** leeres oder fast leeres Log")
+        if alterTage > 7:
+            print(f"      welches nicht mehr beschrieben wird: Alter {alterTage:.0f} Tage")
+        print("---------------------------------")
+        return True
+
     print(
         aus.substitute(
             name=name,
@@ -134,12 +149,23 @@ def logAuswerten(db, datei, Dbg=False):
             bis=bis,
         )
     )
-    #Plausibilitätsprüfungen
-    if dauerTage<7:print("***** kürzer als eine Woche")
-    if dauerTage>35:print("***** länger als ein Monat")
-    if proStunde>18:print("***** Meldunggen zu dicht")
-    if proStunde<5:print("***** Meldunggen zu selten")
-    if alterTage>7:print(f"***** altes Log: {alterTage:.1f} Tage")
-    if nFehler >0:print(f"***** Fehler im Log {nFehler/nZeilen*100:.1f} %")
-    
+    # Anmerkungen
+    if name.startswith("autocreated-"):
+        print("!>>>> Auto-created Logfile")
+    if name.find("CUL_TX") >= 0:
+        print("!>>>> kein Name vergeben (CUL_TX)")
+    # Plausibilitätsprüfungen
+    if dauerTage < 7:
+        print("***** kürzer als eine Woche")
+    if dauerTage > 35:
+        print("***** länger als ein Monat")
+    if proStunde > 18:
+        print("***** Meldunggen zu dicht")
+    if proStunde < 5:
+        print("***** Meldunggen zu selten")
+    if alterTage > 7:
+        print(f"***** altes Log: {alterTage:.1f} Tage")
+    if nFehler > 0:
+        print(f"***** Fehler im Log {nFehler/nZeilen*100:.1f} %")
+
     return nFehler < 6
