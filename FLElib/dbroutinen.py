@@ -2,6 +2,13 @@ from dbparam import *
 import mysql.connector
 import logging
 
+DBTCREATEMW = """ CREATE TABLE `messpunkte` (
+ `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'simpler Zähler',
+ `dateiname` tinytext DEFAULT NULL COMMENT 'Dateiname, ohne Pfad, ist Zugriffskriterium',
+ `messpunkt` tinytext DEFAULT NULL COMMENT 'FHEM-Objekt',
+ `messwert` tinytext DEFAULT NULL COMMENT 'physik. Messgröße',
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"""
 DBTCREATEBB = """ CREATE TABLE `blackboard` (
  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'simpler Zähler',
  `programm` tinytext DEFAULT NULL,
@@ -72,6 +79,8 @@ def dbcreate(db, errtext):
     logging.debug(f"dbcreate: {tabelle}")
     with db.cursor() as cursor:
         match tabelle:
+            case "messpunkte":
+                cursor.execute(DBTCREATEMW)
             case "logfiles":
                 cursor.execute(DBTCREATELOGFILES)
             case "blackboard":
