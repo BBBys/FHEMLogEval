@@ -14,6 +14,14 @@ für jeden Eintrag in der Datenbank eine Übersicht erstellen
 - Zeitraum
 - Anzahl der Meldungen
 - fehlerhafte Meldungen
+- Messstellen
+## 11Auswertung
+Logfiles durchsuchen und Informationen über Messungen ausgeben.
+- Zeitraum
+- Anzahl der Meldungen
+- fehlerhafte Meldungen
+- Messstellen
+Macht also das gleiche, aber ohne Datenbank zu bentzen
 ## wiederholt verwendete Parameter
 * -k: eingehängtes Verzeichnis bleibt erhalten
 * -v: wie üblich: Debug-Ausgabe
