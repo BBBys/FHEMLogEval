@@ -28,8 +28,8 @@ grob auswerten und die wichtigsten Eigenschaften abspeichern
 """
 
 
-def main(keep=False, Dbg=False):
-    logPath = mountLogs()
+def main(pfad,keep=False, Dbg=False):
+    logPath = mountLogs(pfad)
     if logPath is None:
         logging.error("Logs konnten nicht eingebunden werden")
         return "Fehler"
@@ -54,6 +54,13 @@ if __name__ == "__main__":
     LOG_FORMAT = "%(levelname)s %(message)s"
     parser = argparse.ArgumentParser(prog=TITEL, description=DESCRIPTION)
     parser.add_argument(
+        "pfad",
+        nargs="?",
+        default="/opt/fhem/logs",
+        help="optional: Pfad - wird nach Logs durchsucht.",
+     )
+
+    parser.add_argument(
         "-v",
         "--verbose",
         dest="pVerbose",
@@ -70,6 +77,7 @@ if __name__ == "__main__":
 
     arguments = parser.parse_args()
     keep = arguments.pKeep
+    pfad = arguments.pfad
     Dbg = arguments.pVerbose
     if Dbg:
         LOG_LEVEL = logging.DEBUG
@@ -77,4 +85,4 @@ if __name__ == "__main__":
         LOG_LEVEL = logging.INFO
     logging.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
-    sys.exit(main(keep, Dbg))
+    sys.exit(main(pfad,keep, Dbg))

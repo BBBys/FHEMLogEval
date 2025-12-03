@@ -1,12 +1,12 @@
 import sys, logging
 import subprocess, os
-from parameter import MNTPUNKT, TESTFILE
+from parameter import  TESTFILE
 from time import sleep
 
 
-def mountLogs():
+def mountLogs(pfad):
     logging.debug("einhängen")
-    mntp = MNTPUNKT
+    mntp = pfad
     if not os.path.exists(mntp):
         logging.warning(f"Mounpoint {mntp} fehlt - wird erzeugt")
         os.mkdir(mntp)

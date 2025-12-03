@@ -1,4 +1,4 @@
-from dbparam import DBTLOGS, DBTMW
+#from dbparam import DBTLOGS, DBTMW
 import logging
 from os import path
 from datetime import datetime
