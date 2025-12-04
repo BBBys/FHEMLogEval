@@ -1,4 +1,4 @@
-#from dbparam import DBTLOGS, DBTMW
+# from dbparam import DBTLOGS, DBTMW
 import logging
 from os import path
 from datetime import datetime
@@ -134,9 +134,11 @@ def logAuswerten1(name, dateiMitPfad, Dbg=False):
     (von, bis, nZeilen, mpunkte, mwerte, nFehler) = datenAuswerten1(name, dateiMitPfad)
     alterTage = (datetime.now() - bis).total_seconds() / 86400
     dauer = bis - von
-    dauerTage = dauer.total_seconds() / 86400
-    proStunde = nZeilen / dauer.total_seconds() * 3600
-    proMinute = nZeilen / dauer.total_seconds() * 60
+    #ZeroDivisionError verhindern
+    dts=max( dauer.total_seconds(),1)
+    dauerTage =dts / 86400
+    proStunde = nZeilen /dts * 3600
+    proMinute = nZeilen /dts * 60
     lmp = len(mpunkte)
     lmw = len(mwerte)
 

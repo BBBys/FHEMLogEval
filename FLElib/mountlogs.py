@@ -8,7 +8,7 @@ def mountLogs(pfad):
     logging.debug("einhängen")
     mntp = pfad
     if not os.path.exists(mntp):
-        logging.warning(f"Mounpoint {mntp} fehlt - wird erzeugt")
+        logging.warning(f"Mountpoint {mntp} fehlt - wird erzeugt")
         os.mkdir(mntp)
     # das wären dann die Logs
     logfile = os.path.join(mntp, TESTFILE)

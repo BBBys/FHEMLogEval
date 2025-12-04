@@ -28,7 +28,7 @@ grob auswerten und die wichtigsten Eigenschaften abspeichern
 """
 
 
-def main(pfad,keep=False, Dbg=False):
+def main(pfad, keep=False, Dbg=False):
     logPath = mountLogs(pfad)
     if logPath is None:
         logging.error("Logs konnten nicht eingebunden werden")
@@ -58,7 +58,7 @@ if __name__ == "__main__":
         nargs="?",
         default="/opt/fhem/logs",
         help="optional: Pfad - wird nach Logs durchsucht.",
-     )
+    )
 
     parser.add_argument(
         "-v",
@@ -85,4 +85,4 @@ if __name__ == "__main__":
         LOG_LEVEL = logging.INFO
     logging.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
-    sys.exit(main(pfad,keep, Dbg))
+    sys.exit(main(pfad, keep, Dbg))
