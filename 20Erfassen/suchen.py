@@ -1,16 +1,10 @@
 import os, logging
 from verarbeiten import verarbeiten
 
-
 def suchen(pfad, db, Dbg=False):
     """
     Sucht in den Log-Dateien im angegebenen Pfad nach Messwerten
     und schreibt diese in die Datenbank.
-
-    :param pfad: Pfad zu den Log-Dateien
-    :param mydb: MySQL-Datenbankverbindung
-    :param Dbg: Debug-Ausgabe (bool)
-    :return: None
     """
     if not os.path.exists(pfad):
         logging.fatal(f"logsEintragen: Pfad {pfad} existiert nicht.")
@@ -19,6 +13,7 @@ def suchen(pfad, db, Dbg=False):
         iDatei = 0
         for datei in alleDateien:
             fileMitPfad = os.path.join(root, datei)
+            # Dateien ausschließen
             if datei.endswith("fhem.log"):
                 continue
             if datei == "fhem.save":
@@ -28,8 +23,8 @@ def suchen(pfad, db, Dbg=False):
             if os.path.getsize(fileMitPfad) < 10:
                 continue
             iDatei += 1
-            if Dbg and iDatei > 5:
-                break
+            # if Dbg and iDatei > 5:
+            #    break
             logging.debug(f"Verarbeite Datei: {fileMitPfad}")
             with open(fileMitPfad, "r") as f:
                 verarbeiten(f, db, Dbg)

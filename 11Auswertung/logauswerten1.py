@@ -80,7 +80,6 @@ def zeileAuswertbar1(zeile):
 
     return True
 
-
 def datenAuswerten1(name, pfad):
     # Muster Zeile:
     # 2025-11-30_17:44:03 T_DG batteryPercent: 90
@@ -106,6 +105,11 @@ def datenAuswerten1(name, pfad):
             nFehler += 1
             continue
         teile = zeile.split()
+        #Messwerte enden immer mit >:<
+        messwert = teile[2]
+        if messwert.endswith(":"):
+            messwert = messwert[:-1]
+        else:continue
         datstr = teile[0]
         messpkt = teile[1]
         zeit = datetime.strptime(datstr, musterDatum)
@@ -114,7 +118,6 @@ def datenAuswerten1(name, pfad):
         if zeit > letzte:
             letzte = zeit
         messpunkte.add(messpkt)
-        messwert = teile[2]
         messwerte.add(f"{messpkt}+{messwert}")
     # logging.debug(f"Zeit: {erste}...{letzte}")
     logging.debug(f"Messpunkte: {messpunkte}")
@@ -130,24 +133,27 @@ def logAuswerten1(name, dateiMitPfad, Dbg=False):
     if not path.exists(dateiMitPfad):
         logging.error(f"logAuswerten: Datei {dateiMitPfad} existiert nicht mehr")
         return True
-
+    #auswerten
     (von, bis, nZeilen, mpunkte, mwerte, nFehler) = datenAuswerten1(name, dateiMitPfad)
-    alterTage = (datetime.now() - bis).total_seconds() / 86400
+    #wie alt ist letzter Eintrag ?
+    letzterSek= (datetime.now() - bis).total_seconds()
+    letzterStunden =letzterSek / 3600
+    letzterTage =letzterSek / 86400
     dauer = bis - von
-    #ZeroDivisionError verhindern
-    dts=max( dauer.total_seconds(),1)
-    dauerTage =dts / 86400
-    proStunde = nZeilen /dts * 3600
-    proMinute = nZeilen /dts * 60
+    # ZeroDivisionError verhindern
+    dts = max(dauer.total_seconds(), 1)
+    dauerTage = dts / 86400
+    proStunde = nZeilen / dts * 3600
+    proMinute = nZeilen / dts * 60
     lmp = len(mpunkte)
     lmw = len(mwerte)
 
     if nZeilen < 3:
         print("---------------------------------")
         print(f"      {name}\n***** leeres oder fast leeres Log")
-        if alterTage > 7:
+        if letzterTage > 7:
             print(
-                f"      welches nicht mehr beschrieben wird: Alter {alterTage:.0f} Tage"
+                f"      welches nicht mehr beschrieben wird: Alter {letzterTage:.0f} Tage"
             )
         print("---------------------------------")
         return True
@@ -182,7 +188,7 @@ def logAuswerten1(name, dateiMitPfad, Dbg=False):
         print("***** kürzer als eine Woche")
     if dauerTage > 35:
         print("***** länger als ein Monat")
-    if proStunde > 18:
+    if proStunde/lmw > 10:
         print("***** Meldunggen zu dicht")
     if proStunde < 5:
         print("***** Meldunggen zu selten")
@@ -190,8 +196,10 @@ def logAuswerten1(name, dateiMitPfad, Dbg=False):
         print("***** mehr als 1 Messstelle")
     if lmw > 3:
         print("***** viele Messwerte")
-    if alterTage > 7:
-        print(f"***** altes Log: {alterTage:.1f} Tage")
+    if letzterTage > 7:
+        print(f"***** altes Log: {letzterTage:.1f} Tage alt")
+    elif letzterStunden > 6:
+        print(f"***** nicht aktuell: {letzterStunden:.1f} Stunden alt")
     if nFehler > 0:
         print(f"***** Fehler im Log {nFehler/nZeilen*100:.1f} %")
 
