@@ -33,16 +33,9 @@ def main(pfad, keep=False, Dbg=False):
     if logPath is None:
         logging.error("Logs konnten nicht eingebunden werden")
         return "Fehler"
-    try:
-        # mydb = mysql.connector.connect(
-        #    host=DBHOST, db=DBNAME, user=DBUSER, port=DBPORT, password=DBPWD
-        # )  # + ";ConvertZeroDateTime=True;",
-        logsAbrufen1(logPath, Dbg)
-    except Exception as e:
-        logging.exception(e)
-    finally:
-        if not keep:
-            unmountLogs(logPath)
+    logsAbrufen1(logPath, Dbg)
+    if not keep:
+        unmountLogs(logPath)
 
     return 0
 
@@ -57,9 +50,8 @@ if __name__ == "__main__":
         "pfad",
         nargs="?",
         default="/opt/fhem/logs",
-        help="optional: Pfad - wird nach Logs durchsucht.",
+        help="optional: Pfad - wird nach Logs durchsucht. [/opt/fhem/logs]",
     )
-
     parser.add_argument(
         "-v",
         "--verbose",

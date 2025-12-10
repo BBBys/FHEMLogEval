@@ -1,6 +1,7 @@
 import logging
 from dbparam import DBTMW
 
+
 def bereinigen(mydb, Dbg=False):
     """Bereinigen der Datenbank von doppelten Einträgen
 
@@ -13,15 +14,14 @@ def bereinigen(mydb, Dbg=False):
         sql = f"SELECT COUNT(id) AS anzahl FROM {DBTMW};"
         cursor.execute(sql)
         nDaten = cursor.fetchone()["anzahl"]
-        logging.info(f"Anzahl Einträge vor Bereinigung: {nDaten}")
+        logging.info(f"Anzahl Einträge vorher:\t{nDaten}")
         # Beispielbereinigung: Löschen von Einträgen mit ungültigen Werten
         sql = f"DELETE FROM {DBTMW} WHERE messwert IS NULL OR messwert = '';"
         cursor.execute(sql)
-        sql = f"SELECT COUNT(id) AS anzahl FROM {DBTMW};"
+        logging.debug("T in temparatur ändern...")
+        sql = f"UPDATE {DBTMW} SET messgröße = 'temperature' where messgröße = 'T' ;"
         cursor.execute(sql)
-        nDaten = cursor.fetchone()["anzahl"]
-        logging.info(f"Anzahl Einträge nach Bereinigung: {nDaten}")
-
+        logging.debug("Duplikate suchen und entfernen...")
         sql = f"SELECT id,zeitpunkt,messpunkt,messgröße,messwert FROM {DBTMW} ORDER BY zeitpunkt,messpunkt,messgröße,messwert ;"
         cursor.execute(sql)
         messungen = cursor.fetchall()
@@ -36,11 +36,9 @@ def bereinigen(mydb, Dbg=False):
             ):
                 sql_del = f"DELETE FROM {DBTMW} WHERE id = %s;"
                 cursor.execute(sql_del, (curr["id"],))
-
         sql = f"SELECT COUNT(id) AS anzahl FROM {DBTMW};"
         cursor.execute(sql)
         nDaten = cursor.fetchone()["anzahl"]
-        logging.info(f"Anzahl Einträge nach Aufräumen: {nDaten}")
-
-        # mydb.commit()
+        logging.info(f"Anzahl Einträge nachher:\t{nDaten}")
+        mydb.commit()
     logging.info("Datenbankbereinigung abgeschlossen.")

@@ -1,6 +1,7 @@
 import os, logging
 from verarbeiten import verarbeiten
 
+
 def suchen(pfad, db, Dbg=False):
     """
     Sucht in den Log-Dateien im angegebenen Pfad nach Messwerten

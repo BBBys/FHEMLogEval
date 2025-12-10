@@ -4,7 +4,7 @@
 # FHEM Logs Evaluator  © 2025 by Dr. Burkhard Borys
 # is licensed under CC BY-NC-ND 4.0.
 #
-#  Erfassen.py
+#  Plot.py
 
 #
 # Wichtig:
@@ -12,34 +12,27 @@
 #
 
 import mysql.connector
-import logging, argparse
+import logging, argparse, os
 from dbroutinen import dbcreate
 from dbparam import *
-from suchen import suchen
-from bereinigen import bereinigen
-from statistik import statistik
+from auswählen import auswählen
 
-TITEL = "Erfassen"
+TITEL = "Plot"
 VERSION = "V0"
-DESCRIPTION = """Log-Files durchsuchen und Messwerte in eine Datenbank 
-schreiben, von wo aus sie sortiert und weiterverarbetet werden können.
-Wahlweise DB löschen und neu erfassen oder vorhandene Einträge
-mit neuen Daten erweitern
+DESCRIPTION = """Messwerte aus Datenbank plotten
 """
 
 
-def main(pfad, neu=False, Dbg=False):
+def main(pfad, Dbg=False):
     try:
         mydb = mysql.connector.connect(
             host=DBHOST, db=DBNAME, user=DBUSER, port=DBPORT, password=DBPWD
         )
-        if neu:
-            with mydb.cursor() as cursor:
-                cursor.execute(f"TRUNCATE TABLE {DBTMW};")
-        if pfad is not None:
-            suchen(pfad, mydb, Dbg)
-        bereinigen(mydb, Dbg)
-        statistik(mydb, Dbg)
+        if not os.path.isfile(pfad):
+            logging.fatal(f"Datei nicht gefunden: {pfad}")
+            return 1
+        auswählen(pfad, Dbg)
+
     except mysql.connector.errors.ProgrammingError as e:
         logging.error(e)
         match e.errno:
@@ -70,28 +63,15 @@ if __name__ == "__main__":
         action="store_true",
         help="Debug-Ausgabe",
     )
-    parser.add_argument(
-        "-n",
-        "--neu",
-        dest="pNeu",
-        action="store_true",
-        help="DB leeren und neu erfassen (sonst nur ergänzen)",
-    )
-    parser.add_argument(
-        "pfad",
-        nargs="?",
-        default=None,
-        help="optional: Pfad - wenn angegeben wird nach Logs durchsucht (sonst nur schon vorhandene Messwerte)",
-    )
+    parser.add_argument("pfad", default=None, help="Datei mit Pfad, wo Daten liegen")
 
     arguments = parser.parse_args()
     pfad = arguments.pfad
     Dbg = arguments.pVerbose
-    neu = arguments.pNeu
     if Dbg:
         LOG_LEVEL = logging.DEBUG
     else:
         LOG_LEVEL = logging.INFO
     logging.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
-    sys.exit(main(pfad, neu, Dbg))
+    sys.exit(main(pfad, Dbg))

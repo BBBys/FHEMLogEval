@@ -1,4 +1,3 @@
-# from dbparam import DBTLOGS, DBTMW
 import logging
 from os import path
 from datetime import datetime
@@ -80,6 +79,7 @@ def zeileAuswertbar1(zeile):
 
     return True
 
+
 def datenAuswerten1(name, pfad):
     # Muster Zeile:
     # 2025-11-30_17:44:03 T_DG batteryPercent: 90
@@ -105,11 +105,12 @@ def datenAuswerten1(name, pfad):
             nFehler += 1
             continue
         teile = zeile.split()
-        #Messwerte enden immer mit >:<
+        # Messwerte enden immer mit >:<
         messwert = teile[2]
         if messwert.endswith(":"):
             messwert = messwert[:-1]
-        else:continue
+        else:
+            continue
         datstr = teile[0]
         messpkt = teile[1]
         zeit = datetime.strptime(datstr, musterDatum)
@@ -133,18 +134,18 @@ def logAuswerten1(name, dateiMitPfad, Dbg=False):
     if not path.exists(dateiMitPfad):
         logging.error(f"logAuswerten: Datei {dateiMitPfad} existiert nicht mehr")
         return True
-    #auswerten
+    # auswerten
     (von, bis, nZeilen, mpunkte, mwerte, nFehler) = datenAuswerten1(name, dateiMitPfad)
-    #wie alt ist letzter Eintrag ?
-    letzterSek= (datetime.now() - bis).total_seconds()
-    letzterStunden =letzterSek / 3600
-    letzterTage =letzterSek / 86400
+    # wie alt ist letzter Eintrag ?
+    letzterSek = (datetime.now() - bis).total_seconds()
+    letzterStunden: float = letzterSek / 3600
+    letzterTage: float = letzterSek / 86400
     dauer = bis - von
     # ZeroDivisionError verhindern
     dts = max(dauer.total_seconds(), 1)
-    dauerTage = dts / 86400
-    proStunde = nZeilen / dts * 3600
-    proMinute = nZeilen / dts * 60
+    dauerTage: float = dts / 86400
+    proStunde: float = nZeilen / dts * 3600
+    proMinute: float = nZeilen / dts * 60
     lmp = len(mpunkte)
     lmw = len(mwerte)
 
@@ -188,7 +189,7 @@ def logAuswerten1(name, dateiMitPfad, Dbg=False):
         print("***** kürzer als eine Woche")
     if dauerTage > 35:
         print("***** länger als ein Monat")
-    if proStunde/lmw > 10:
+    if proStunde / lmw > 10:
         print("***** Meldunggen zu dicht")
     if proStunde < 5:
         print("***** Meldunggen zu selten")

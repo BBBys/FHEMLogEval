@@ -23,9 +23,7 @@ def logsAbrufen1(pfad, Dbg=False):
                 continue
             dateiMitPfad = os.path.join(root, dateiName)
             if os.path.getsize(dateiMitPfad) < 10:
-                logging.debug(
-                    f"logsEintragen: Datei {dateiName} zu klein, übersprungen"
-                )
+                logging.info(f"{dateiName} zu klein, übersprungen")
                 continue
             # basisName = nameReduzieren(datei)
             logging.debug(f"logsAbrufen: Datei {dateiName} wird ausgewertet")
