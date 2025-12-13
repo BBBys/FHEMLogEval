@@ -55,6 +55,7 @@ def main(pfad, Dbg=False):
 if __name__ == "__main__":
     import sys
 
+    global Dbg
     # LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(message)s"
     LOG_FORMAT = "%(levelname)s %(message)s"
     parser = argparse.ArgumentParser(prog=TITEL, description=DESCRIPTION)

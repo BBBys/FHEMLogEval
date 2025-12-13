@@ -2,3 +2,5 @@ mysql-connector-python
 argparse
 black
 pandas
+matplotlib
+PyQt5 

@@ -16,7 +16,7 @@ Zugriff auf die Logfiles (/opt/fhem/log/*), direkt oder mit Samba-Freigabe der L
   - Name
   - Format der Einträge
 
-## 10Auswertung
+## 10Auswertung :unamused::unamused::unamused: Fehlschlag
 
 Für jeden Eintrag in der Datenbank eine Übersicht erstellen
 - Zeitraum
