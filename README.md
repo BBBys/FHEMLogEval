@@ -36,6 +36,17 @@ Macht also das gleiche wie 10Auswertung, aber ohne eine Datenbank zu benutzen.
 
 Das Modul ist so aufgebaut, dass es automatisch periodisch ablaufen kann - etwa in cron.daily, ...weekly oder ...monthly.
 
+## 20Erfassen
+
+Schreibt alle Messungen aus allen Logfiles in eine Datenbank, von wo aus geordnet für weitere Auswertungen abgerufen werden können.
+
+## 50Plots
+
+In Arbeit.
+Soll mal Daten grafisch darstellen.
+
+Liest die Daten aus einer CSV-Datei, die vorher aus der Datenbank durch Export erzeugt werden muss.
+
 ## wiederholt verwendete Parameter
 
 * -k: eingehängtes Verzeichnis bleibt erhalten
@@ -44,6 +55,7 @@ Das Modul ist so aufgebaut, dass es automatisch periodisch ablaufen kann - etwa 
 ## FLElib
 
 ... fasst zentrale Module zusammen
+Einbinden mit ```export PYTHONPATH="../FLElib"```
 
 # Lizenz
 

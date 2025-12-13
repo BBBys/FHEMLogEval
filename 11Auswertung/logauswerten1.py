@@ -89,9 +89,10 @@ def datenAuswerten1(name, pfad):
     # 1. Zeitabdeckung, Messpunkte
     erste = datetime.strptime("2099-12-31_0:0:0", musterDatum)
     letzte = datetime.strptime("1900-12-31_0:0:0", musterDatum)
-    messpunkte = set()
+    messStellen = set()
     # 2. Messwerte je Messpunkt
-    messwerte = set()
+    werteMitStellen = set()
+    WerteStellenAnzahl = dict()
     with open(pfad, "r") as f:
         zeilen = f.readlines()
     nZeilen = 0
@@ -106,25 +107,34 @@ def datenAuswerten1(name, pfad):
             continue
         teile = zeile.split()
         # Messwerte enden immer mit >:<
-        messwert = teile[2]
-        if messwert.endswith(":"):
-            messwert = messwert[:-1]
+        dieserMessWert = teile[2]
+        if dieserMessWert.endswith(":"):
+            dieserMessWert = dieserMessWert[:-1]
         else:
+            # dann ist es kein Messwert
             continue
-        datstr = teile[0]
-        messpkt = teile[1]
-        zeit = datetime.strptime(datstr, musterDatum)
+        einZeitpunkt = teile[0]
+        eineMessStelle = teile[1]
+        zeit = datetime.strptime(einZeitpunkt, musterDatum)
         if zeit < erste:
             erste = zeit
         if zeit > letzte:
             letzte = zeit
-        messpunkte.add(messpkt)
-        messwerte.add(f"{messpkt}+{messwert}")
+        messStellen.add(eineMessStelle)
+        # Zähle Vorkommen eines Messwertes
+        ws_key = f"{eineMessStelle}+{dieserMessWert}"
+        werteMitStellen.add(ws_key)
+        if ws_key in WerteStellenAnzahl:
+            WerteStellenAnzahl[ws_key] += 1
+        else:
+            WerteStellenAnzahl[ws_key] = 1
     # logging.debug(f"Zeit: {erste}...{letzte}")
-    logging.debug(f"Messpunkte: {messpunkte}")
-    logging.debug(f"Messwerte: {messwerte}")
+    logging.debug(f"Messpunkte: {messStellen}")
+    logging.debug(f"Messwerte: {werteMitStellen}")
 
-    return (erste, letzte, nZeilen, messpunkte, messwerte, nFehler)
+    # erwartet:
+    # (von, bis, nZeilen, alleMessStellen, alleWerteMitStellen, nFehler)
+    return (erste, letzte, nZeilen, messStellen, WerteStellenAnzahl, nFehler)
 
 
 # eine einzelne Logfile auswerten,
@@ -135,7 +145,9 @@ def logAuswerten1(name, dateiMitPfad, Dbg=False):
         logging.error(f"logAuswerten: Datei {dateiMitPfad} existiert nicht mehr")
         return True
     # auswerten
-    (von, bis, nZeilen, mpunkte, mwerte, nFehler) = datenAuswerten1(name, dateiMitPfad)
+    (von, bis, nZeilen, alleMessStellen, alleWerteMitStellen, nFehler) = (
+        datenAuswerten1(name, dateiMitPfad)
+    )
     # wie alt ist letzter Eintrag ?
     letzterSek = (datetime.now() - bis).total_seconds()
     letzterStunden: float = letzterSek / 3600
@@ -146,8 +158,8 @@ def logAuswerten1(name, dateiMitPfad, Dbg=False):
     dauerTage: float = dts / 86400
     proStunde: float = nZeilen / dts * 3600
     proMinute: float = nZeilen / dts * 60
-    lmp = len(mpunkte)
-    lmw = len(mwerte)
+    lmp = len(alleMessStellen)
+    lmw = len(alleWerteMitStellen)
 
     if nZeilen < 3:
         print("---------------------------------")
@@ -173,12 +185,13 @@ def logAuswerten1(name, dateiMitPfad, Dbg=False):
             nwerte=lmw,
         )
     )
-    for messPunkt in mpunkte:
-        print(f"      ❯ {messPunkt}")
-        for messWert in mwerte:
-            (mpw, mww) = mpwsplit(messWert)
-            if mpw == messPunkt:
-                print(f"      » {mww}")
+    for mstelle in alleMessStellen:
+        print(f"  ❯\t{mstelle}")
+        for mwertstelle in alleWerteMitStellen.keys():
+            (diesestelle, dieserwert) = mpwsplit(mwertstelle)
+            if diesestelle == mstelle:
+                n = alleWerteMitStellen[mwertstelle]
+                print(f"\t» {n}\t{dieserwert} ")
     # Anmerkungen
     if name.startswith("autocreated-"):
         print("!>>>> Auto-created Logfile")

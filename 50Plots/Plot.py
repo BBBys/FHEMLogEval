@@ -19,15 +19,17 @@ from auswählen import auswählen
 
 TITEL = "Plot"
 VERSION = "V0"
-DESCRIPTION = """Messwerte aus Datenbank plotten
+DESCRIPTION = """Messwerte aus CSV-Datei plotten. 
+Diese Datei muss vorher aus der Datenbank durch Export erzeugt werden.
 """
 
 
 def main(pfad, Dbg=False):
     try:
-        mydb = mysql.connector.connect(
-            host=DBHOST, db=DBNAME, user=DBUSER, port=DBPORT, password=DBPWD
-        )
+        # verzichten wir auf die Datenbank
+        # mydb = mysql.connector.connect(
+        #    host=DBHOST, db=DBNAME, user=DBUSER, port=DBPORT, password=DBPWD
+        # )
         if not os.path.isfile(pfad):
             logging.fatal(f"Datei nicht gefunden: {pfad}")
             return 1
@@ -44,8 +46,8 @@ def main(pfad, Dbg=False):
                 logging.exception(e)
     except Exception as e:
         logging.exception(e)
-    finally:
-        mydb.close()
+    # finally:
+    # mydb.close()
 
     return 0
 
