@@ -16,29 +16,28 @@ def auswählen(datei, Dbg=False):
     # dftemp: pd.DataFrame = df.query("messpunkt == 'T_Garten' and messgröße == 'temperature'")
     dftemp = dftemp.astype(convert_dict, errors="ignore")
     dftemp = dftemp.drop(columns=["messgröße"])
-    #Sortieren nach name und Zeit
+    # Sortieren nach name und Zeit
     df = dftemp.sort_values(["messpunkt", "zeitpunkt"]).copy()
-   
+
     if Dbg:
         print(df.head())
         print(df.tail())
         print(df.info())
 
-    #MultiIndex setzen und resamplen
+    # MultiIndex setzen und resamplen
     result = (
-        df.set_index(["messpunkt", "zeitpunkt"])    # MultiIndex: (name, Zeit)
-        #df.set_index(["zeitpunkt"])    # MultiIndex: (name, Zeit)
-        .resample("10min", level="zeitpunkt") # 10-Minuten-Raster auf Zeit-Ebene
-        .interpolate(method="linear", limit_direction="both") # Werte interpolieren
-        .reset_index() # Index zurück in Spalten
-        .loc[:, ["zeitpunkt", "messpunkt", "messwert"]] # Spaltenordnung
+        df.set_index(["messpunkt", "zeitpunkt"])  # MultiIndex: (name, Zeit)
+        # df.set_index(["zeitpunkt"])    # MultiIndex: (name, Zeit)
+        .resample("10min", level="zeitpunkt")  # 10-Minuten-Raster auf Zeit-Ebene
+        .interpolate(method="linear", limit_direction="both")  # Werte interpolieren
+        .reset_index()  # Index zurück in Spalten
+        .loc[:, ["zeitpunkt", "messpunkt", "messwert"]]  # Spaltenordnung
     )
     if Dbg:
         print(result.head())
         print(result.tail())
         print(result.info())
 
-    
     # df_pivot = y.pivot(index='zeitpunkt', columns='messpunkt', values='messgröße')
     # if Dbg:        print(df_pivot.head(55))
 

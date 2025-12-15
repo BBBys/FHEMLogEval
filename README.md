@@ -44,7 +44,10 @@ Das Modul ist so aufgebaut, dass es automatisch periodisch ablaufen kann - etwa 
 
 ## 20Erfassen
 
-Schreibt alle Messungen aus allen Logfiles in eine Datenbank, von wo aus geordnet für weitere Auswertungen abgerufen werden können.
+Log-Files durchsuchen und Messwerte in eine Datenbank 
+schreiben, von wo aus sie sortiert und weiterverarbetet werden können.
+Wahlweise DB löschen und neu erfassen oder vorhandene Einträge
+mit neuen Daten erweitern
 
 ## 50Plots
 
@@ -62,6 +65,19 @@ Liest die Daten aus einer CSV-Datei, die vorher aus der Datenbank durch Export e
 
 ... fasst zentrale Module zusammen
 Einbinden mit ```export PYTHONPATH="../FLElib"```
+
+### mountlogs
+
+Mounted Log-Verzeichnis vom FHEM-Server.
+Verwendung:
+
+```
+from mountlogs import mountLogs, unmountLogs
+pfadErgebnis=mountLogs(pfadVorgabe)
+...
+unmountLogs(logPath)
+```
+
 
 # Lizenz
 
