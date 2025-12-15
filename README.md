@@ -26,7 +26,13 @@ Für jeden Eintrag in der Datenbank eine Übersicht erstellen
 
 ## 11Auswertung
 
-Logfiles durchsuchen und Informationen über Messungen ausgeben.
+Log-Files, die im angegebenen Verzeichnis liegen 
+grob auswerten und zu jedem eine Übersicht ausgeben.
+Falls im angegebenen Verzeichnis nicht die FHEM-Logfiles liegen,
+was an der Datei ```fhem.save``` erkannt wird,
+wird dieses Verzeichnis vom FHEM-Server gemounted.
+
+Ausgegeben wird
 - Zeitraum
 - Anzahl der Meldungen
 - fehlerhafte Meldungen

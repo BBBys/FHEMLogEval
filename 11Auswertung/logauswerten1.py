@@ -16,8 +16,9 @@ aus = Template(
       über $dauer
       von $von bis $bis
       enthält $npunkte Messpunkte
-      und $nwerte Messwerte
->>>   gemessen wird"""
+      und $nwerte Messwerte $altwarn
+      -------------------------------
+     gemessen wird"""
 )
 
 
@@ -171,6 +172,10 @@ def logAuswerten1(name, dateiMitPfad, Dbg=False):
         print("---------------------------------")
         return True
 
+    if letzterStunden > 6:
+        altwarn = f"\n      {letzterStunden:.1f} Stunden alt"
+    else:
+        altwarn = ""
     print(
         aus.substitute(
             name=name,
@@ -183,6 +188,7 @@ def logAuswerten1(name, dateiMitPfad, Dbg=False):
             bis=bis,
             npunkte=lmp,
             nwerte=lmw,
+            altwarn=altwarn,
         )
     )
     for mstelle in alleMessStellen:

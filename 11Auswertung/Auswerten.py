@@ -23,17 +23,27 @@ from mountlogs import mountLogs, unmountLogs
 TITEL = "Auswerten"
 VERSION = "V1"
 VERARBEITEN = "verarbeiten!"
-DESCRIPTION = """Log-Files, die imVerzeichnis liegen, \n
-grob auswerten und die wichtigsten Eigenschaften abspeichern
+DESCRIPTION = """Log-Files, die im angegebenen Verzeichnis liegen 
+grob auswerten zu jedem eine Übersicht ausgeben.
+Falls im angegebenen Verzeichnis nicht die FHEM-Logfiles liegen,
+was an der Datei fhem.save erkannt wird,
+wird dieses Verzeichnis vom FHEM-Server gemounted.
+
+Ausgegeben wird
+- Zeitraum
+- Anzahl der Meldungen
+- fehlerhafte Meldungen
+- Messstellen
+
 """
 
 
-def main(pfad, keep=False, Dbg=False):
+def main(pfad, keep=False, interaktiv=False, Dbg=False):
     logPath = mountLogs(pfad)
     if logPath is None:
         logging.error("Logs konnten nicht eingebunden werden")
         return "Fehler"
-    logsAbrufen1(logPath, Dbg)
+    logsAbrufen1(logPath, interaktiv, Dbg)
     if not keep:
         unmountLogs(logPath)
 
@@ -66,15 +76,23 @@ if __name__ == "__main__":
         action="store_true",
         help="Logfiles behalten (kein Un-Mount nach Verarbeitung)",
     )
+    parser.add_argument(
+        "-i",
+        "--interaktiv",
+        dest="Interaktiv",
+        action="store_true",
+        help="interaktiv: Abbrechen, wenn Eingriff erforderlich",
+    )
 
     arguments = parser.parse_args()
     keep = arguments.pKeep
     pfad = arguments.pfad
     Dbg = arguments.pVerbose
+    interaktiv = arguments.Interaktiv
     if Dbg:
         LOG_LEVEL = logging.DEBUG
     else:
         LOG_LEVEL = logging.INFO
     logging.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
-    sys.exit(main(pfad, keep, Dbg))
+    sys.exit(main(pfad, keep, interaktiv, Dbg))

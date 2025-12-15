@@ -8,13 +8,15 @@ from fhemnamen import nameReduzieren
 
 # Liste der Logfiles abrufen
 # jede einzelne auswerten
-def logsAbrufen1(pfad, Dbg=False):
+def logsAbrufen1(pfad, interaktiv=False, Dbg=False):
     if not os.path.exists(pfad):
         logging.fatal(f"logsAbrufen: Pfad {pfad} existiert nicht.")
         return f"Pfad {pfad} existiert nicht."
     OK = False
+    idatei = 0
     for root, dirs, dateien in os.walk(pfad):
         for dateiName in dateien:
+            # diverse Dateien werden nich ausgewertet:
             if dateiName.endswith("fhem.log"):
                 continue
             if dateiName == "fhem.save":
@@ -25,10 +27,11 @@ def logsAbrufen1(pfad, Dbg=False):
             if os.path.getsize(dateiMitPfad) < 10:
                 logging.info(f"{dateiName} zu klein, übersprungen")
                 continue
-            # basisName = nameReduzieren(datei)
-            logging.debug(f"logsAbrufen: Datei {dateiName} wird ausgewertet")
+            # dann auswerten:
+            idatei += 1
+            logging.info(f"{idatei}.: {dateiName} wird ausgewertet")
             OK = logAuswerten1(dateiName, dateiMitPfad, Dbg)
-            if not OK:
+            if interaktiv and not OK:
                 break
 
     return
