@@ -25,14 +25,22 @@ Diese Datei muss vorher aus der Datenbank durch Export erzeugt werden.
 
 
 def main(pfad, Dbg=False):
+    
     try:
-        # verzichten wir auf die Datenbank
-        # mydb = mysql.connector.connect(
-        #    host=DBHOST, db=DBNAME, user=DBUSER, port=DBPORT, password=DBPWD
-        # )
+        if not os.path.isfile(pfad):
+            #Datei fehlt
+            mydb = mysql.connector.connect(host=DBHOST, db=DBNAME, user=DBUSER, port=DBPORT, password=DBPWD)
+            sql=f"SELECT * from messungen INTO OUTFILE '{pfad}' "\
+                "FIELDS TERMINATED BY ';'" \
+                "OPTIONALLY ENCLOSED BY '\"';"
+            #sql="SELECT * FROM `messungen` ORDER BY `zeitpunkt` ASC"
+            logging.debug(sql)
+            with mydb.cursor() as cursor:
+                cursor.execute(sql)
+            mydb.close()
+        #jetzt muss die Datei da sein
         if not os.path.isfile(pfad):
             logging.fatal(f"Datei nicht gefunden: {pfad}")
-            return 1
         auswählen(pfad, Dbg)
 
     except mysql.connector.errors.ProgrammingError as e:
@@ -46,8 +54,6 @@ def main(pfad, Dbg=False):
                 logging.exception(e)
     except Exception as e:
         logging.exception(e)
-    # finally:
-    # mydb.close()
 
     return 0
 

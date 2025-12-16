@@ -46,8 +46,14 @@ Das Modul ist so aufgebaut, dass es automatisch periodisch ablaufen kann - etwa 
 
 Log-Files durchsuchen und Messwerte in eine Datenbank 
 schreiben, von wo aus sie sortiert und weiterverarbetet werden können.
+
 Wahlweise DB löschen und neu erfassen oder vorhandene Einträge
-mit neuen Daten erweitern
+mit neuen Daten erweitern.
+
+Verwendung von pfad: 
+1) kein Pfad: nur Aufräum-Aktionen in der Datenbank.
+2) Pfad enthält ein oder mehr Logfiles: diese auswerten
+3) Pfad ist leer: FHEM-Log-Verzeichnis vom Server laden und auswerten
 
 ## 50Plots
 
@@ -67,8 +73,8 @@ Liest die Daten aus einer CSV-Datei, die vorher aus der Datenbank durch Export e
 Einbinden mit ```export PYTHONPATH="../FLElib"```
 
 ### mountlogs
-
-Mounted Log-Verzeichnis vom FHEM-Server.
+#### mountLogs / unmountLogs
+Mounted Log-Verzeichnis vom 🖥 FHEM-Server.
 Verwendung:
 
 ```
@@ -78,6 +84,9 @@ pfadErgebnis=mountLogs(pfadVorgabe)
 unmountLogs(logPath)
 ```
 
+#### istLogDir
+
+Test, ob das Verzeichnis Logfiles enthält
 
 # Lizenz
 

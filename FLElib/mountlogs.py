@@ -2,7 +2,11 @@ import sys, logging
 import subprocess, os
 from parameter import  TESTFILE
 from time import sleep
+from pathlib import Path
 
+def istLogDir(pfad):
+    sucheIn = Path(pfad)
+    return any(sucheIn.glob("*.log"))
 
 def mountLogs(pfad):
     logging.debug("einhängen")
