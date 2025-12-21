@@ -55,6 +55,8 @@ Verwendung von pfad:
 2) Pfad enthält ein oder mehr Logfiles: diese auswerten
 3) Pfad ist leer: FHEM-Log-Verzeichnis vom Server laden und auswerten
 
+Die Datenbank wird bei jedem Lauf bereinigt, indem doppelte und irrelevante 
+Einträge gelöscht werden.
 ## 50Plots
 
 In Arbeit.

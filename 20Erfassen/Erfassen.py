@@ -18,14 +18,15 @@ from dbparam import *
 from suchen import suchen
 from bereinigen import bereinigen
 from statistik import statistik
-from mountlogs import mountLogs, unmountLogs,istLogDir
+from mountlogs import mountLogs, unmountLogs, istLogDir
 
 TITEL = "Erfassen"
 VERSION = "V0"
 DESCRIPTION = """Log-Files durchsuchen und Messwerte in eine Datenbank 
-schreiben, von wo aus sie sortiert und weiterverarbetet werden können.
+schreiben, von wo aus sie sortiert und weiterverarbeitet werden können.
 Wahlweise DB löschen und neu erfassen oder vorhandene Einträge
 mit neuen Daten erweitern. 
+Danach bereinigen: Duplikate und überflüssige Daten löschen. 
 Verwendung von pfad: 
 1) kein Pfad: nur Aufräum-Aktionen in der Datenbank.
 2) Pfad enthält ein oder mehr Logfiles: diese auswerten
@@ -39,7 +40,7 @@ def main(pfad, keep=True, neu=False, Dbg=False):
             host=DBHOST, db=DBNAME, user=DBUSER, port=DBPORT, password=DBPWD
         )
         if pfad is not None:
-            if  istLogDir(pfad):
+            if istLogDir(pfad):
                 logging.info(f"Logfiles von {pfad}")
             else:
                 logging.info("Logfiles vom Server")
@@ -48,14 +49,14 @@ def main(pfad, keep=True, neu=False, Dbg=False):
                     # mount-Fehler
                     logging.error("Logs konnten nicht eingebunden werden")
                     return "Fehler"
-                #else:
+                # else:
             # es wird nur gelöscht, wenn auch neue Daten da sind
             if neu:
                 with mydb.cursor() as cursor:
                     cursor.execute(f"TRUNCATE TABLE {DBTMW};")
             # suchen und DB füllen
             suchen(pfad, mydb, Dbg)
-        #else: pfad is None
+        # else: pfad is None
         #
         # egal, ob Pfad oder nicht:
         # doppelte Einträge usw.
