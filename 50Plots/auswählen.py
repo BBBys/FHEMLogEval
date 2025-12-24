@@ -4,45 +4,54 @@ import pandas as pd
 
 
 def auswählen(datei, Dbg=False):
-    sensors = ["T_Garten"]
-    convert_dict = {"messwert": float}
+    sensors = ["TGarten"]
+    convert_dict = {"zeitpunkt": "datetime64[ns]", "messwert": float}
 
     logging.info(f"Lese Daten aus {datei}")
 
-    df: pd.DataFrame = pd.read_csv(
-        datei, sep=";", usecols=[1, 2, 3, 4], parse_dates=["zeitpunkt"]
-    )
-    dftemp: pd.DataFrame = df.query(" messgröße == 'temperature'")
-    # dftemp: pd.DataFrame = df.query("messpunkt == 'T_Garten' and messgröße == 'temperature'")
-    dftemp = dftemp.astype(convert_dict, errors="ignore")
-    dftemp = dftemp.drop(columns=["messgröße"])
-    # Sortieren nach name und Zeit
-    df = dftemp.sort_values(["messpunkt", "zeitpunkt"]).copy()
-
-    if Dbg:
+    df: pd.DataFrame = pd.read_csv(datei, sep=";", usecols=[0, 1, 2], parse_dates=[0])
+    if Dbg or True:
+        print(df.info())
         print(df.head())
         print(df.tail())
+        print(df.index)
+        print(type(df.index))
+    df.columns = ["zeitpunkt", "messpunkt", "messwert"]
+    print("Vorher:", df["zeitpunkt"].dtype)
+    df = df.astype(convert_dict, errors="ignore")
+    df["zeitpunkt"] = pd.to_datetime(df["zeitpunkt"], format="mixed")
+    print("Nachher:", df["zeitpunkt"].dtype)
+    # df.set_index(["messpunkt", "zeitpunkt"])  # MultiIndex: (name, Zeit)
+    # df=df.set_index(["zeitpunkt"])
+    df = df.set_index("zeitpunkt")
+    print("Index-Typ:", type(df.index))
+
+    if Dbg or True:
         print(df.info())
+        print(df.head())
+        print(df.tail())
+        print(df.index)
+        print(type(df.index))
 
-    # MultiIndex setzen und resamplen
-    result = (
-        df.set_index(["messpunkt", "zeitpunkt"])  # MultiIndex: (name, Zeit)
-        # df.set_index(["zeitpunkt"])    # MultiIndex: (name, Zeit)
-        .resample("10min", level="zeitpunkt")  # 10-Minuten-Raster auf Zeit-Ebene
-        .interpolate(method="linear", limit_direction="both")  # Werte interpolieren
-        .reset_index()  # Index zurück in Spalten
-        .loc[:, ["zeitpunkt", "messpunkt", "messwert"]]  # Spaltenordnung
-    )
-    if Dbg:
-        print(result.head())
-        print(result.tail())
-        print(result.info())
-
+    dfresa = df.resample("30min").asfreq()  # 10-Minuten-Raster auf Zeit-Ebene
+    if Dbg or True:
+        print(dfresa.info())
+        print(dfresa.head())
+        print(dfresa.tail())
+    dfinterp = dfresa.interpolate(
+        method="time"
+    )  # , limit_direction="both")  # Werte interpolieren
+    if Dbg or True:
+        print(dfinterp.info())
+        print(dfinterp.head())
+        print(dfinterp.tail())
+    # df = dftemp.sort_values(["messpunkt", "zeitpunkt"]).copy()
     # df_pivot = y.pivot(index='zeitpunkt', columns='messpunkt', values='messgröße')
     # if Dbg:        print(df_pivot.head(55))
 
     # Plotten
-    result.plot(figsize=(10, 6))
+    logging.basicConfig(level=logging.info)
+    dfinterp.plot(figsize=(10, 6))
     plt.xlabel("Zeit")
     plt.ylabel("Messwert")
     plt.title("Messwerte über Zeit pro Messstelle")
