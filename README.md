@@ -99,8 +99,14 @@ https://creativecommons.org/licenses/by-nc-nd/4.0/
 
 # Quellen
 
-    [1] Benjamin Baka, Python data structures and algorithms : improve the performance and speed of your applications. Packt Publishing, 2017.
+    [1] Benjamin Baka, Python data structures and algorithms : improve 
+    the performance and speed of your applications. Packt Publishing, 2017.
   
-    [2] Ivan Idris, Python data analysis cookbook : over 140 practical recipes to help you make sense of your data with ease and build production-ready data apps. Packt Publishing, 2016.
+    [2] Ivan Idris, Python data analysis cookbook : over 140 practical 
+    recipes to help you make sense of your data with ease and build 
+    production-ready data apps. Packt Publishing, 2016.
     
-
+    [3] Alice Zheng and Amanda Casari, Feature engineering for machine
+    learning : principles and techniques for data scientists. 
+    O’Reilly Media, 2018.
+  

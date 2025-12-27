@@ -1,16 +1,8 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-#
-# FHEM Logs Evaluator  © 2025 by Dr. Burkhard Borys
-# is licensed under CC BY-NC-ND 4.0.
-#
-#  Plot.py
-
 #
 # Wichtig:
 # export PYTHONPATH="../FLElib"
 #
-
+from DateiAusDB import DateiAusDB
 import mysql.connector
 import logging, argparse, os
 from dbroutinen import dbcreate
@@ -64,26 +56,7 @@ def main(pfad, neu=False, übers=False, Dbg=False):
 
             if fehlt:
                 # wenn Datei fehlt
-                sql = f"""SELECT * from messungen   
-                    WHERE 'messpunkt' = 'TGarten'
-                    INTO OUTFILE '{pfad}'
-                    FIELDS TERMINATED BY ';'
-                    OPTIONALLY ENCLOSED BY '\"';"""
-                # sql = f"""SELECT zeitpunkt,messpunkt,messgröße,messwert from messungen
-                sql = f"""SELECT zeitpunkt,messpunkt,messwert from messungen
-                    WHERE 
-                        (STRCMP(messpunkt,'TGarten') =0 
-                        or 
-                        STRCMP(messpunkt,'Lufttemperatur') =0)
-                    INTO OUTFILE '{pfad}'
-                    FIELDS TERMINATED BY ';'
-                    OPTIONALLY ENCLOSED BY '\"';"""
-                logging.debug(sql)
-                with mydb.cursor() as cursor:
-                    cursor.execute(sql)  # result ist immer None
-
-                sz = os.path.getsize(pfad)
-                logging.debug(f"Filesize neu={sz}")
+                DateiAusDB(pfad, mydb)
 
             mydb.close()
 

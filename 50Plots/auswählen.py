@@ -1,47 +1,61 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# FHEM Logs Evaluator  © 2025 by Dr. Burkhard Borys
+# is licensed under CC BY-NC-ND 4.0.
+#
+#  auswählen.py
+
 import logging
 import matplotlib.pyplot as plt
 import pandas as pd
 
 
 def auswählen(datei, Dbg=False):
+    # DFCOLUMNS =["zeitpunkt", "messpunkt", "messwert"]
+    DFCOLUMNS = ["zeitpunkt", "messwert"]
     sensors = ["TGarten"]
     convert_dict = {"zeitpunkt": "datetime64[ns]", "messwert": float}
 
     logging.info(f"Lese Daten aus {datei}")
 
-    df: pd.DataFrame = pd.read_csv(datei, sep=";", usecols=[0, 1, 2], parse_dates=[0])
-    if Dbg or True:
+    df: pd.DataFrame = pd.read_csv(datei, sep=";", usecols=[0, 1], parse_dates=[0])
+    if Dbg:
         print(df.info())
         print(df.head())
         print(df.tail())
         print(df.index)
         print(type(df.index))
-    df.columns = ["zeitpunkt", "messpunkt", "messwert"]
-    print("Vorher:", df["zeitpunkt"].dtype)
+    df.columns = DFCOLUMNS
+    # print("Vorher:", df["zeitpunkt"].dtype)
     df = df.astype(convert_dict, errors="ignore")
     df["zeitpunkt"] = pd.to_datetime(df["zeitpunkt"], format="mixed")
-    print("Nachher:", df["zeitpunkt"].dtype)
+    # print("Nachher:", df["zeitpunkt"].dtype)
     # df.set_index(["messpunkt", "zeitpunkt"])  # MultiIndex: (name, Zeit)
-    # df=df.set_index(["zeitpunkt"])
     df = df.set_index("zeitpunkt")
-    print("Index-Typ:", type(df.index))
-
-    if Dbg or True:
-        print(df.info())
-        print(df.head())
-        print(df.tail())
-        print(df.index)
-        print(type(df.index))
-
-    dfresa = df.resample("30min").asfreq()  # 10-Minuten-Raster auf Zeit-Ebene
-    if Dbg or True:
+    # print("Index-Typ:", type(df.index))
+    # print("Prüfen, ob der Index wirklich ein DatetimeIndex ist")
+    # print(df.index)
+    # print(type(df.index))
+    # print(df.index.dtype)
+    # print("""
+    # Erwartet: DatetimeIndex([...], dtype='datetime64[ns]', freq=None)
+    # Wenn dtype=object oder freq=None ohne echte Zeitangaben → Problem.""")
+    # print("""Sicherstellen, dass die Werte numerisch sind
+    # Falls deine Spalte wert z. B. Strings enthält, wird nicht interpoliert:""")
+    # print(df.dtypes)
+    # print("Erwartet: wert int64 oder float64.")
+    #    dfresa = df.resample("90min").mean()  # 10-Minuten-Raster auf Zeit-Ebene
+    dfresa = df.resample("90min").mean()  # 10-Minuten-Raster auf Zeit-Ebene
+    if Dbg:
         print(dfresa.info())
         print(dfresa.head())
         print(dfresa.tail())
+
     dfinterp = dfresa.interpolate(
-        method="time"
-    )  # , limit_direction="both")  # Werte interpolieren
-    if Dbg or True:
+        method="time", limit_direction="both"
+    )  # Werte interpolieren
+    if Dbg:
         print(dfinterp.info())
         print(dfinterp.head())
         print(dfinterp.tail())
@@ -50,7 +64,7 @@ def auswählen(datei, Dbg=False):
     # if Dbg:        print(df_pivot.head(55))
 
     # Plotten
-    logging.basicConfig(level=logging.info)
+    logging.basicConfig(level=logging.CRITICAL)
     dfinterp.plot(figsize=(10, 6))
     plt.xlabel("Zeit")
     plt.ylabel("Messwert")
