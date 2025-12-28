@@ -6,8 +6,10 @@ from DatenAusDB import DatenAusDB
 import mysql.connector
 import logging, argparse
 from dbroutinen import dbcreate
-from dbparam import DBHOST, DBNAME, DBPORT, DBPWD, DBTMW, DBUSER
-from auswerten import auswerten
+from dbparam import DBHOST, DBNAME, DBPORT, DBPWD, DBUSER
+from Auswerten import auswerten
+from Statistik import statistik
+from Übersicht import übersicht
 
 TITEL = "Plot"
 VERSION = "V1.0"
@@ -21,25 +23,13 @@ def main(übers=False, Dbg=False):
         )
         # Übersicht angefordert
         if übers:
-            logging.info("Übersicht angefordert...")
-            with mydb.cursor(dictionary=True) as cursor:
-                sql = f"SELECT messgröße FROM  {DBTMW} GROUP BY messgröße"
-                cursor.execute(sql)
-                messungen = cursor.fetchall()
-                print("----------\n\nMessungen:\n")
-                for messung in messungen:
-                    print(messung["messgröße"])
-                sql = f"SELECT messpunkt FROM  {DBTMW} GROUP BY messpunkt"
-                cursor.execute(sql)
-                messungen = cursor.fetchall()
-                print("-----------\n\nMesspunkte:\n")
-                for messung in messungen:
-                    print(messung["messpunkt"])
-            logging.info("...Abfrage beendet")
+            übersicht(mydb)
             return
 
         df = DatenAusDB(mydb)
         mydb.close()
+
+        statistik(df)
 
         auswerten(df, Dbg)
 

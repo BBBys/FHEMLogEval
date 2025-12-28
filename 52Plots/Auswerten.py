@@ -12,10 +12,7 @@ import pandas as pd
 
 
 def auswerten(df: pd.DataFrame, Dbg=False):
-    # DFCOLUMNS =["zeitpunkt", "messpunkt", "messwert"]
-    DFCOLUMNS = ["zeitpunkt", "messwert"]
     sensors = ["TGarten"]
-    convert_dict = {"zeitpunkt": "datetime64[ns]", "messwert": float}
     anzahl = len(df)
     logging.info(f"Datensätze: {anzahl}")
     if anzahl < 2:
@@ -27,10 +24,6 @@ def auswerten(df: pd.DataFrame, Dbg=False):
         print(df.tail())
         print(df.index)
         print(type(df.index))
-    df.columns = DFCOLUMNS
-    df = df.astype(convert_dict, errors="ignore")
-    df["zeitpunkt"] = pd.to_datetime(df["zeitpunkt"], format="mixed")
-    df = df.set_index("zeitpunkt")
     dfresa = df.resample("10min").mean()  # 10-Minuten-Raster auf Zeit-Ebene
     if Dbg:
         print(dfresa.info())
@@ -42,7 +35,7 @@ def auswerten(df: pd.DataFrame, Dbg=False):
         print(dfinterp.info())
         print(dfinterp.head())
         print(dfinterp.tail())
-   
+
     # Plotten
     logging.basicConfig(level=logging.CRITICAL)
     dfinterp.plot(figsize=(10, 6))
@@ -64,4 +57,3 @@ def auswerten(df: pd.DataFrame, Dbg=False):
         print(y.head(15))
     """
     return
-   
