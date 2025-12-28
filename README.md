@@ -57,12 +57,19 @@ Verwendung von pfad:
 
 Die Datenbank wird bei jedem Lauf bereinigt, indem doppelte und irrelevante 
 Einträge gelöscht werden.
-## 50Plots
 
-In Arbeit.
-Soll mal Daten grafisch darstellen.
+## 50Plots - Sackgasse :unamused:
 
-Liest die Daten aus einer CSV-Datei, die vorher aus der Datenbank durch Export erzeugt werden muss.
+Sollte mal Daten grafisch darstellen. Jetzt weitergeführt als 52Plots
+
+Liest die Daten aus einer CSV-Datei, die vorher aus der Datenbank durch 
+Export erzeugt werden muss.
+
+## 52Plots
+
+Stellt Daten grafisch dar.
+
+Liest die Daten direkt mit Pandas aus der Datenbank.
 
 ## wiederholt verwendete Parameter
 
