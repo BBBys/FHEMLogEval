@@ -4,8 +4,8 @@ import numpy as np
 
 
 def statistik(df):
-    deciles = df["messwert"].quantile([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
-    print(deciles)
+    quantile = df["messwert"].quantile([0.01, 0.1, 0.25, 0.5, 0.75, 0.9, 0.99])
+    print(quantile)
 
     sns.set_style("whitegrid")
     fig, ax = plt.subplots()
@@ -16,10 +16,9 @@ def statistik(df):
     ax.set_ylabel("Occurrence", fontsize=14)
     plt.show()
 
-    sns.set_style("whitegrid")
     fig, ax = plt.subplots()
     df["messwert"].hist(ax=ax, bins=100)
-    for pos in deciles:
+    for pos in quantile:
         handle = plt.axvline(pos, color="r")
     ax.legend([handle], ["deciles"], fontsize=14)
     ax.set_yscale("log")

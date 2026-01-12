@@ -116,4 +116,11 @@ https://creativecommons.org/licenses/by-nc-nd/4.0/
     [3] Alice Zheng and Amanda Casari, Feature engineering for machine
     learning : principles and techniques for data scientists. 
     O’Reilly Media, 2018.
+
+    [4] Alberto Boschetti and Luca Massaron, Python data science essentials : 
+    become an efficient data science practitioner by understanding Python’s 
+    key concepts. Packt Publishing, 2016.
+
+    [5] VS Code's Copilot.
+  
   

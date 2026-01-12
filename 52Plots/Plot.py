@@ -16,7 +16,7 @@ VERSION = "V1.0"
 DESCRIPTION = """Messwerte aus der Datenbank holen und darstellen."""
 
 
-def main(übers=False, Dbg=False):
+def main(übers=False, stat=False, plot=False, Dbg=False):
     try:
         mydb = mysql.connector.connect(
             host=DBHOST, db=DBNAME, user=DBUSER, port=DBPORT, password=DBPWD
@@ -29,9 +29,11 @@ def main(übers=False, Dbg=False):
         df = DatenAusDB(mydb)
         mydb.close()
 
-        statistik(df)
+        if stat:
+            statistik(df)
 
-        auswerten(df, Dbg)
+        if plot:
+            auswerten(df, Dbg)
 
     except mysql.connector.errors.ProgrammingError as e:
         logging.error(e)
@@ -68,14 +70,30 @@ if __name__ == "__main__":
         action="store_true",
         help="schreibe Übersicht über Datenbank-Inhalt",
     )
+    parser.add_argument(
+        "-z",
+        "--zeichne",
+        dest="pPlot",
+        action="store_true",
+        help="zeichne Daten (Wert über Zeit)",
+    )
+    parser.add_argument(
+        "-s",
+        "--statistik",
+        dest="pStatistik",
+        action="store_true",
+        help="gib Überblick über Daten (Verteilung, ...)",
+    )
 
     arguments = parser.parse_args()
     Übersicht = arguments.pÜbersicht
     Dbg = arguments.pVerbose
+    Plot = arguments.pPlot
+    Statistik = arguments.pStatistik
     if Dbg:
         LOG_LEVEL = logging.DEBUG
     else:
         LOG_LEVEL = logging.INFO
     logging.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
-    sys.exit(main(Übersicht, Dbg))
+    sys.exit(main(Übersicht, Statistik, Plot, Dbg))

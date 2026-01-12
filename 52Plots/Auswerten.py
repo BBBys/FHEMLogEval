@@ -9,6 +9,7 @@
 import logging
 import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn as sns
 
 
 def auswerten(df: pd.DataFrame, Dbg=False):
@@ -24,21 +25,22 @@ def auswerten(df: pd.DataFrame, Dbg=False):
         print(df.tail())
         print(df.index)
         print(type(df.index))
-    dfresa = df.resample("10min").mean()  # 10-Minuten-Raster auf Zeit-Ebene
+    resampled = df.resample("10min").mean()  # 10-Minuten-Raster auf Zeit-Ebene
     if Dbg:
-        print(dfresa.info())
-        print(dfresa.head())
-        print(dfresa.tail())
+        print(resampled.info())
+        print(resampled.head())
+        print(resampled.tail())
 
-    dfinterp = dfresa.interpolate(method="time", limit_direction="both")
+    interpoliert = resampled.interpolate(method="time", limit_direction="both")
     if Dbg:
-        print(dfinterp.info())
-        print(dfinterp.head())
-        print(dfinterp.tail())
+        print(interpoliert.info())
+        print(interpoliert.head())
+        print(interpoliert.tail())
 
     # Plotten
     logging.basicConfig(level=logging.CRITICAL)
-    dfinterp.plot(figsize=(10, 6))
+    sns.set_style("whitegrid")
+    interpoliert.plot(figsize=(10, 6))
     plt.xlabel("Zeit")
     plt.ylabel("Messwert")
     plt.title("Messwerte über Zeit pro Messstelle")

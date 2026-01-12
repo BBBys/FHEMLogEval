@@ -652,3 +652,4 @@ iters.txt
 /exiftest
 00Sammeln/credentials.py
 11Auswertung/x.txt
+*.eml

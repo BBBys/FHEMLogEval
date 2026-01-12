@@ -11,7 +11,7 @@ def übersicht(mydb):
         sql = f"SELECT messgröße FROM  {DBTMW} GROUP BY messgröße"
         cursor.execute(sql)
         messungen = cursor.fetchall()
-        print("----------\n\nMessungen:\n")
+        print("----------\nMessgrößen:\n")
         for messung in messungen:
             print(messung["messgröße"])
         sql = f"SELECT messpunkt FROM  {DBTMW} GROUP BY messpunkt"

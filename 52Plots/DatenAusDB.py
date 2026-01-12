@@ -20,7 +20,7 @@ def DatenAusDB(mydb):
 
     sql = f"""SELECT zeitpunkt,Messwert from {DBTMW}
                     WHERE 
-                        messpunkt='VBad'
+                        messgröße='temperature'
                     ORDER BY zeitpunkt;"""
     logging.debug(sql)
     df = pd.read_sql(sql, mydb)
