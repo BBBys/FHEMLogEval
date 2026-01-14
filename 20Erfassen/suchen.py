@@ -9,9 +9,10 @@ def suchen(pfad, db, Dbg=False):
     """
     if not os.path.exists(pfad):
         logging.fatal(f"logsEintragen: Pfad {pfad} existiert nicht.")
-        return f"Pfad {pfad} existiert nicht."
+        return 0
     for root, dirs, alleDateien in os.walk(pfad):
         iDatei = 0
+        gesamtZeilen = 0
         for datei in alleDateien:
             fileMitPfad = os.path.join(root, datei)
             # Dateien ausschließen
@@ -28,4 +29,6 @@ def suchen(pfad, db, Dbg=False):
             #    break
             logging.debug(f"Verarbeite Datei: {fileMitPfad}")
             with open(fileMitPfad, "r") as f:
-                verarbeiten(f, db, Dbg)
+                nZeilen = verarbeiten(f, db, Dbg)
+            gesamtZeilen += nZeilen
+    return iDatei, gesamtZeilen

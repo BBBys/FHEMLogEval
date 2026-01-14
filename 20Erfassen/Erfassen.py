@@ -12,9 +12,10 @@
 #
 
 import mysql.connector
-import logging, argparse
+import logging, argparse, time
 from dbroutinen import dbcreate
-from dbparam import *
+from dbparam import DBHOST, DBNAME, DBUSER, DBPORT, DBPWD, DBTMW
+
 from suchen import suchen
 from bereinigen import bereinigen
 from statistik import statistik
@@ -55,12 +56,39 @@ def main(pfad, keep=True, neu=False, Dbg=False):
                 with mydb.cursor() as cursor:
                     cursor.execute(f"TRUNCATE TABLE {DBTMW};")
             # suchen und DB füllen
-            suchen(pfad, mydb, Dbg)
+
+            tAnfang = time.time()
+            nDateien, nZeilen = suchen(pfad, mydb, Dbg)
+
+            tEnde = time.time()
+            dauer = tEnde - tAnfang
+            spd = dauer / nDateien
+            dpz = nZeilen / dauer
+            logging.info("Übername in DB:")
+            logging.info(f"Zeit\t{dauer:.0f} s")
+            logging.info(f"Dateien\t{nDateien}")
+            logging.info(f"Zeilen\t{nZeilen}")
+            logging.info(f"\t\t{spd:.3f}\tSekunden / Datei")
+            logging.info(f"\t\t{dpz:.0f}\tZeilen / Sekunde")
+
         # else: pfad is None
         #
         # egal, ob Pfad oder nicht:
         # doppelte Einträge usw.
-        bereinigen(mydb, Dbg)
+
+        tAnfang = time.time()
+        vorher, nachher = bereinigen(mydb, Dbg)
+        tEnde = time.time()
+        bereinigt = vorher - nachher
+        dauer = tEnde - tAnfang
+        dpz1 = vorher / dauer
+        dpz = bereinigt / dauer
+        logging.info("Bereinigung von DB:")
+        logging.info(f"Zeit\t{dauer:.0f} s")
+        logging.info(f"Einträge\t{nZeilen}")
+        logging.info(f"\t\t{dpz1:.0f}\tEinträge / Sekunde geprüft")
+        logging.info(f"\t\t{dpz:.0f}\tEinträge / Sekunde gelöscht")
+
         # Überblick:
         statistik(mydb, Dbg)
         # keine weitere Verarbeitung:
@@ -74,8 +102,8 @@ def main(pfad, keep=True, neu=False, Dbg=False):
                 dbcreate(mydb, e.msg)
             case _:
                 logging.exception(e)
-    except Exception as e:
-        logging.exception(e)
+    # except Exception as e:
+    #    logging.exception(e)
     finally:
         mydb.close()
         if not keep:
@@ -88,7 +116,9 @@ if __name__ == "__main__":
     import sys
 
     # LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(message)s"
-    LOG_FORMAT = "%(levelname)s %(message)s"
+    # LOG_FORMAT = "%(levelname)s %(message)s"
+    LOG_FORMAT = "%(levelname)s:%(funcName)s@%(lineno)d:%(message)s"
+
     parser = argparse.ArgumentParser(prog=TITEL, description=DESCRIPTION)
     parser.add_argument(
         "-v",

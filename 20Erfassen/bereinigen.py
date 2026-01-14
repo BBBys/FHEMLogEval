@@ -58,8 +58,8 @@ def bereinigen(mydb, Dbg=False):
     with mydb.cursor(dictionary=True) as cursor:
         sql = f"SELECT COUNT(id) AS anzahl FROM {DBTMW};"
         cursor.execute(sql)
-        nDaten = cursor.fetchone()["anzahl"]
-        logging.info(f"Anzahl Einträge vorher:\t{nDaten}")
+        nDatenVorher = cursor.fetchone()["anzahl"]
+        logging.info(f"Anzahl Einträge vorher:\t{nDatenVorher}")
         # Beispielbereinigung: Löschen von Einträgen mit ungültigen Werten
         sql = f"DELETE FROM {DBTMW} WHERE messwert IS NULL OR messwert = '';"
         cursor.execute(sql)
@@ -105,7 +105,8 @@ def bereinigen(mydb, Dbg=False):
 
         sql = f"SELECT COUNT(id) AS anzahl FROM {DBTMW};"
         cursor.execute(sql)
-        nDaten = cursor.fetchone()["anzahl"]
-        logging.info(f"Anzahl Einträge nachher:\t{nDaten}")
+        nDatenNachher = cursor.fetchone()["anzahl"]
+        logging.info(f"Anzahl Einträge nachher:\t{nDatenNachher}")
         mydb.commit()
     logging.info("Datenbankbereinigung abgeschlossen.")
+    return nDatenVorher, nDatenNachher

@@ -8,24 +8,30 @@ from dbparam import DBTMW
 #   in DB eintragen
 # keine Kontrolle auf Plausibilität oder doppelte Einträge
 def verarbeiten(file, db, Dbg=False):
-    iz = 0
+    iZeile = 0
     with db.cursor() as cursor:
         # alle Zeilen
         for zeile in file:
-            iz += 1
+            iZeile += 1
             # if Dbg and iz > 10:
             #    break
             # logging.debug(zeile)
             teile = zeile.split()
             if len(teile) < 4:
-                logging.warning(f"Zeile {iz} unvollständig: {zeile}")
+                # ungewöhnliches Format bei Wetterdaten
+                if teile[1] == "Wetterdaten" and teile[2] == "OK":
+                    continue
+                # ungewöhnliches Format bei Tageslicht
+                if teile[1] == "Tageslicht" and len(teile) == 3:
+                    continue
+                logging.warning(f"{file} Zeile {iZeile} unvollständig:\n>{zeile}<")
                 continue
             messgröße = teile[2]
             # jede messgröße endet mit >:<
             if messgröße.endswith(":"):
                 messgröße = messgröße[:-1]
             else:
-                logging.warning(f"Zeile {iz} keine Messgröße: {zeile}")
+                logging.warning(f"Zeile {iZeile} keine Messgröße: {zeile}")
                 continue
             datum = teile[0]
             messpunkt = teile[1]
@@ -35,4 +41,4 @@ def verarbeiten(file, db, Dbg=False):
             val = (datum, messpunkt, messgröße, messwert)
             cursor.execute(sql, val)
     db.commit()
-    return
+    return iZeile
