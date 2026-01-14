@@ -144,7 +144,7 @@ def datenAuswerten1(name, pfad):
 def logAuswerten1(name, dateiMitPfad, Dbg=False):
     if not path.exists(dateiMitPfad):
         logging.error(f"logAuswerten: Datei {dateiMitPfad} existiert nicht mehr")
-        return True
+        return True, 0
     # auswerten
     (von, bis, nZeilen, alleMessStellen, alleWerteMitStellen, nFehler) = (
         datenAuswerten1(name, dateiMitPfad)
@@ -170,7 +170,7 @@ def logAuswerten1(name, dateiMitPfad, Dbg=False):
                 f"      welches nicht mehr beschrieben wird: Alter {letzterTage:.0f} Tage"
             )
         print("---------------------------------")
-        return True
+        return True, 0
 
     if letzterStunden > 6:
         altwarn = f"\n      {letzterStunden:.1f} Stunden alt"
@@ -223,4 +223,4 @@ def logAuswerten1(name, dateiMitPfad, Dbg=False):
     if nFehler > 0:
         print(f"***** Fehler im Log {nFehler/nZeilen*100:.1f} %")
 
-    return nFehler < 6
+    return (nFehler < 6), nZeilen

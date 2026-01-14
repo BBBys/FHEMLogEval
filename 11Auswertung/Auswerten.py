@@ -28,12 +28,17 @@ grob auswerten zu jedem eine Übersicht ausgeben.
 Falls im angegebenen Verzeichnis nicht die FHEM-Logfiles liegen,
 was an der Datei fhem.save erkannt wird,
 wird dieses Verzeichnis vom FHEM-Server gemounted.
+Bei Angabe von -k (keep) wird das Verzeichnis nicht wieder unmounted.
 
 Ausgegeben wird
-- Zeitraum
-- Anzahl der Meldungen
-- fehlerhafte Meldungen
-- Messstellen
+- Zeitraum,
+- Anzahl der Meldungen,
+- fehlerhafte Meldungen,
+- Messstellen.
+
+Die Auswertung erfolgt ohne Datenbankanbindung, 
+die Ergebnisse werden auf der Konsole ausgegeben. Dabei fällt u.U. viel Text an,
+der ggf. in eine Datei umgeleitet (>aus.txt) werden sollte.
 
 """
 
