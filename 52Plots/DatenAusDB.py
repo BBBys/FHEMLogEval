@@ -13,14 +13,13 @@ from dbparam import DBTMW
 # import mysql.connector
 
 
-def DatenAusDB(mydb):
+def DatenAusDB(mydb, messgr) -> pd.DataFrame:
     # DFCOLUMNS =["zeitpunkt", "messpunkt", "messwert"]
     DFCOLUMNS = ["zeitpunkt", "messwert"]
     convert_dict = {"zeitpunkt": "datetime64[ns]", "messwert": float}
 
     sql = f"""SELECT zeitpunkt,Messwert from {DBTMW}
-                    WHERE 
-                        messgröße='temperature'
+                    WHERE messgröße={messgr}
                     ORDER BY zeitpunkt;"""
     logging.debug(sql)
     df = pd.read_sql(sql, mydb)

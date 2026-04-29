@@ -44,7 +44,7 @@ def auswerten(df: pd.DataFrame, Dbg=False):
     plt.xlabel("Zeit")
     plt.ylabel("Messwert")
     plt.title("Messwerte über Zeit pro Messstelle")
-    plt.legend(title="Messstelle")
+    # plt.legend(title="Messstelle")
     plt.show()
 
     """

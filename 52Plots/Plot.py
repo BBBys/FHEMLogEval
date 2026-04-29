@@ -16,7 +16,7 @@ VERSION = "V1.0"
 DESCRIPTION = """Messwerte aus der Datenbank holen und darstellen."""
 
 
-def main(übers=False, stat=False, plot=False, Dbg=False):
+def main(übers, stat, plot, messgr, Dbg=False):
     try:
         mydb = mysql.connector.connect(
             host=DBHOST, db=DBNAME, user=DBUSER, port=DBPORT, password=DBPWD
@@ -26,7 +26,7 @@ def main(übers=False, stat=False, plot=False, Dbg=False):
             übersicht(mydb)
             return
 
-        df = DatenAusDB(mydb)
+        df = DatenAusDB(mydb, messgr)
         mydb.close()
 
         if stat:
@@ -44,8 +44,6 @@ def main(übers=False, stat=False, plot=False, Dbg=False):
                 dbcreate(mydb, e.msg)
             case _:
                 logging.exception(e)
-    except Exception as e:
-        logging.exception(e)
 
     return 0
 
@@ -54,8 +52,15 @@ if __name__ == "__main__":
     import sys
 
     global Dbg
-    LOG_FORMAT = "%(levelname)s: %(message)s"
+    LOG_FORMAT = "%(levelname)s:%(funcName)s@%(lineno)d:%(message)s"
     parser = argparse.ArgumentParser(prog=TITEL, description=DESCRIPTION)
+    parser.add_argument(
+        "-g",
+        "--Messgröße",
+        #        dest="pMGR",
+        type=ascii,
+        help="Messgröße, die dargestellt werden soll, z-B. Temperatur",
+    )
     parser.add_argument(
         "-v",
         "--verbose",
@@ -86,6 +91,10 @@ if __name__ == "__main__":
     )
 
     arguments = parser.parse_args()
+
+    print(arguments)
+
+    Messgr = arguments.pMGR
     Übersicht = arguments.pÜbersicht
     Dbg = arguments.pVerbose
     Plot = arguments.pPlot
@@ -96,4 +105,4 @@ if __name__ == "__main__":
         LOG_LEVEL = logging.INFO
     logging.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 
-    sys.exit(main(Übersicht, Statistik, Plot, Dbg))
+    sys.exit(main(Übersicht, Statistik, Plot, Messgr, Dbg))
